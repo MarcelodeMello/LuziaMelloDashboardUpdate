@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Luzia Mello — Painel de Controle</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=DM+Serif+Display&display=swap');
+  :root {
+    --vermelho:#8B1A1A;--vermelho-claro:#C0392B;--vermelho-borda:#6B1010;
+    --ouro:#C9A84C;--ouro-claro:#E2C97E;
+    --fundo:#0F0A0A;--fundo-card:#1A1010;--fundo-card2:#1F1414;
+    --texto:#F2EDE8;--texto-suave:#A89890;--borda:#2E1A1A;
+    --verde:#4CAF82;--amarelo:#D4A017;--azul:#5B8DB8;--roxo:#9B59B6;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{height:100%;overflow:hidden}
+  body{font-family:'Inter',sans-serif;background:var(--fundo);color:var(--texto);display:flex;flex-direction:column}
+  header{background:linear-gradient(135deg,#1A0808,#2A0E0E,#1A0808);border-bottom:1px solid var(--vermelho-borda);padding:0 32px;height:54px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;box-shadow:0 2px 20px rgba(139,26,26,0.3)}
+  .logo-area{display:flex;align-items:center;gap:12px}
+  .logo-icon{width:48px;height:48px;background:var(--transparent);border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:17px}
+  .logo-texto h1{font-family:'DM Serif Display',serif;font-size:15px;color:var(--ouro-claro)}
+  .logo-texto p{font-size:9px;color:var(--texto-suave);letter-spacing:2px;text-transform:uppercase}
+  .header-right{display:flex;align-items:center;gap:18px}
+  .data-hora .data{font-size:12px;color:var(--ouro-claro);font-weight:500;text-align:right}
+  .data-hora .hora{font-size:10px;color:var(--texto-suave);text-align:right}
+  .btn-entrar{background:var(--vermelho);color:white;border:none;padding:7px 18px;border-radius:6px;font-family:'Inter',sans-serif;font-size:12px;font-weight:600;cursor:pointer}
+  .btn-entrar:hover{background:var(--vermelho-claro)}
+  .linha-acento{height:2px;background:linear-gradient(90deg,transparent,var(--vermelho),var(--ouro),var(--vermelho),transparent);flex-shrink:0}
+  main{flex:1;padding:8px 28px 6px;display:flex;flex-direction:column;gap:7px;overflow:hidden}
+  .topo-row{display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+  .mes-selector{display:flex;align-items:center;gap:8px}
+  .mes-selector label{font-size:10px;color:var(--texto-suave);letter-spacing:1px;text-transform:uppercase}
+  .mes-selector select{background:var(--fundo-card2);border:1px solid var(--borda);color:var(--ouro-claro);border-radius:5px;padding:3px 8px;font-size:11px;font-family:'Inter',sans-serif;cursor:pointer;outline:none}
+  .btn-mes{background:transparent;border:1px solid var(--borda);color:var(--texto-suave);border-radius:5px;padding:3px 8px;font-size:10px;cursor:pointer;transition:all 0.2s}
+  .btn-mes:hover{border-color:var(--vermelho);color:var(--texto)}
+  .btn-mes.ativo{background:var(--vermelho);border-color:var(--vermelho);color:white}
+  .kpi-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:7px;flex-shrink:0}
+  .kpi-card{background:var(--fundo-card);border:1px solid var(--borda);border-radius:7px;padding:11px 13px;position:relative;overflow:hidden}
+  .kpi-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--vermelho);opacity:0.6}
+  .kpi-card.destaque::before{background:var(--ouro);opacity:1}
+  .kpi-card.alerta::before{background:var(--amarelo);opacity:1}
+  .kpi-card.perigo::before{background:var(--vermelho-claro);opacity:1}
+  .kpi-card.positivo::before{background:var(--verde);opacity:1}
+  .kpi-card.igpm::before{background:var(--azul);opacity:1}
+  .kpi-card.ipca::before{background:var(--roxo);opacity:1}
+  .kpi-card.saldo-pos::before{background:var(--verde);opacity:1}
+  .kpi-card.saldo-neg::before{background:var(--vermelho-claro);opacity:1}
+  .kpi-icone{font-size:13px;margin-bottom:2px;display:block}
+  .kpi-label{font-size:9px;color:var(--texto-suave);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:2px;display:block}
+  .kpi-valor{font-size:22px;font-weight:700;color:var(--texto);line-height:1}
+  .kpi-valor.monetario{font-size:15px}
+  .kpi-valor.igpm-val{font-size:20px;color:var(--azul)}
+  .kpi-valor.ipca-val{font-size:20px;color:var(--roxo)}
+  .kpi-valor.saldo-val-pos{font-size:20px;color:var(--verde)}
+  .kpi-valor.saldo-val-neg{font-size:20px;color:var(--vermelho-claro)}
+  .kpi-sub{font-size:9px;color:var(--texto-suave);margin-top:3px;display:block}
+  .grid-superior{display:grid;grid-template-columns:1fr 1fr;gap:7px;flex-shrink:0}
+  .grid-inferior{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:7px;flex:1;min-height:0}
+  .painel-card{background:var(--fundo-card);border:1px solid var(--borda);border-radius:7px;padding:10px;position:relative;overflow:hidden;display:flex;flex-direction:column}
+  .painel-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--vermelho),var(--ouro))}
+  .painel-titulo{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--texto-suave);margin-bottom:7px;font-weight:500;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+  .painel-badge{font-size:8px;background:var(--borda);border-radius:3px;padding:1px 6px;color:var(--ouro-claro)}
+  .painel-fonte{font-size:7px;color:var(--texto-suave);margin-top:3px;text-align:right;flex-shrink:0;font-style:italic;opacity:0.7}
+  .fluxo-resumo{display:grid;grid-template-columns:1fr 1fr 1fr;gap:5px;margin-bottom:6px;flex-shrink:0}
+  .fluxo-num{background:var(--fundo-card2);border-radius:5px;padding:5px;text-align:center;border:1px solid var(--borda)}
+  .fn-val{font-size:19px;font-weight:700;line-height:1}
+  .fn-label{font-size:7px;letter-spacing:1px;text-transform:uppercase;color:var(--texto-suave);margin-top:1px}
+  .fn-ini .fn-val{color:var(--verde)}
+  .fn-fin .fn-val{color:var(--vermelho-claro)}
+  .tabela-wrap{overflow-y:auto;flex:1;min-height:0}
+  table{width:100%;border-collapse:collapse;font-size:11px}
+  th{font-size:8px;letter-spacing:1px;text-transform:uppercase;color:var(--texto-suave);padding:3px 5px;text-align:left;border-bottom:1px solid var(--borda);position:sticky;top:0;background:var(--fundo-card);z-index:1}
+  td{padding:4px 5px;border-bottom:1px solid rgba(46,26,26,0.4);color:var(--texto)}
+  tr:last-child td{border-bottom:none}
+  tr:hover td{background:rgba(139,26,26,0.08)}
+  .badge-I{background:rgba(76,175,130,0.15);color:var(--verde);border-radius:3px;padding:1px 4px;font-size:8px;font-weight:600}
+  .badge-F{background:rgba(192,57,43,0.15);color:var(--vermelho-claro);border-radius:3px;padding:1px 4px;font-size:8px;font-weight:600}
+  .pl-col{color:var(--ouro-claro);font-weight:600}
+  .val-verde{color:var(--verde);font-weight:600}
+  .val-ouro{color:var(--ouro-claro);font-weight:700}
+  .dias-urgente{color:var(--vermelho-claro);font-weight:700}
+  .dias-alerta{color:var(--amarelo);font-weight:700}
+  .dias-ok{color:var(--verde);font-weight:600}
+  .empty-msg{color:var(--texto-suave);font-size:10px;text-align:center;padding:12px 0;font-style:italic}
+  .barra-item{display:grid;grid-template-columns:80px 1fr 26px;align-items:center;gap:6px;margin-bottom:4px}
+  .barra-label{font-size:9px;color:var(--texto-suave);text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .barra-trilha{background:var(--borda);border-radius:3px;height:12px;overflow:hidden}
+  .barra-fill{height:100%;border-radius:3px;transition:width 1s ease;width:0%}
+  .barra-qtd{font-size:9px;color:var(--ouro-claro);font-weight:600;text-align:right}
+  /* PIZZA — ocupa 100% da largura */
+  #graf-status{display:flex;flex-direction:column;align-items:center;flex:1;min-height:0;gap:6px}
+  #graf-status svg{width:100%;height:auto;max-height:180px}
+  .pizza-legenda{width:100%;display:flex;flex-direction:column;gap:4px;padding:0 4px}
+  .leg-item{display:flex;align-items:center;gap:5px;font-size:10px;color:var(--texto-suave)}
+  .leg-cor{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+  .leg-pct{margin-left:auto;color:var(--texto);font-weight:600;font-size:10px}
+  .inad-wrap{display:flex;flex-direction:column;gap:5px;flex:1;min-height:0;justify-content:flex-start;padding-top:2px}
+  .inad-barra{flex-shrink:0}
+  .inad-label-row{display:flex;justify-content:space-between;margin-bottom:2px}
+  .inad-label{font-size:9px;color:var(--texto-suave)}
+  .inad-val{font-size:9px;font-weight:600}
+  .status-bar{background:var(--fundo-card2);border:1px solid var(--borda);border-radius:5px;padding:4px 14px;display:flex;align-items:center;justify-content:space-between;font-size:10px;color:var(--texto-suave);flex-shrink:0}
+  .status-dot{width:5px;height:5px;border-radius:50%;background:var(--verde);animation:pulsar 2s infinite;display:inline-block;margin-right:5px}
+  @keyframes pulsar{0%,100%{opacity:1}50%{opacity:0.3}}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+  .kpi-card{animation:fadeUp 0.3s ease both}
+  .kpi-card:nth-child(1){animation-delay:0.03s}.kpi-card:nth-child(2){animation-delay:0.06s}
+  .kpi-card:nth-child(3){animation-delay:0.09s}.kpi-card:nth-child(4){animation-delay:0.12s}
+  .kpi-card:nth-child(5){animation-delay:0.15s}.kpi-card:nth-child(6){animation-delay:0.18s}
+  .kpi-card:nth-child(7){animation-delay:0.21s}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo-area">
+    <div class="logo-icon">
+	  <img src="logo_novo.png" alt="Logo Luzia Mello" style="width:100%;height:100%;object-fit:contain;" />
+	</div>
+    <div class="logo-texto">
+      <h1>Luzia Mello Empreendimentos</h1>
+      <p>Imobiliária · Locação · Gestão</p>
+    </div>
+  </div>
+  <div class="header-right">
+    <div class="data-hora">
+      <div class="data" id="data-atual"></div>
+      <div class="hora" id="hora-atual"></div>
+    </div>
+    <button class="btn-entrar" onclick="window.close()">Entrar no Sistema →</button>
+  </div>
+</header>
+<div class="linha-acento"></div>
+<main>
+  <div class="topo-row">
+    <div class="mes-selector">
+      <label>Visualizando:</label>
+      <select id="sel-mes" onchange="filtrarMes(this.value)"></select>
+      <button class="btn-mes" id="btn-hoje" onclick="voltarHoje()">Mês atual</button>
+    </div>
+    <div style="font-size:9px;color:var(--texto-suave)" id="label-exibido"></div>
+  </div>
+  <div class="kpi-grid">
+    <div class="kpi-card destaque"><span class="kpi-icone">📋</span><span class="kpi-label">Contratos Ativos</span><div class="kpi-valor" id="kpi-ativos">–</div><span class="kpi-sub">vigentes</span></div>
+    <div class="kpi-card destaque"><span class="kpi-icone">💰</span><span class="kpi-label">Receita Total</span><div class="kpi-valor monetario" id="kpi-receita">–</div><span class="kpi-sub">aluguéis ativos</span></div>
+    <div class="kpi-card positivo"><span class="kpi-icone">📊</span><span class="kpi-label">Ticket Médio</span><div class="kpi-valor monetario" id="kpi-ticket">–</div><span class="kpi-sub">por contrato</span></div>
+    <div class="kpi-card alerta"><span class="kpi-icone">🔄</span><span class="kpi-label">Reajustes</span><div class="kpi-valor" id="kpi-reajuste">–</div><span class="kpi-sub" id="kpi-sub-reaj">mês atual</span></div>
+    <div class="kpi-card igpm"><span class="kpi-icone">📈</span><span class="kpi-label">IGP-M 12 meses</span><div class="kpi-valor igpm-val" id="kpi-igpm">–</div><span class="kpi-sub" id="kpi-igpm-fonte">FGV/IBRE</span></div>
+    <div class="kpi-card ipca"><span class="kpi-icone">📉</span><span class="kpi-label">IPCA 12 meses</span><div class="kpi-valor ipca-val" id="kpi-ipca">–</div><span class="kpi-sub" id="kpi-ipca-fonte">IBGE via BCB</span></div>
+    <div class="kpi-card" id="kpi-card-saldo"><span class="kpi-icone">⚖️</span><span class="kpi-label">Saldo Anual</span><div class="kpi-valor" id="kpi-saldo-ano">–</div><span class="kpi-sub" id="kpi-sub-saldo">contratos no ano</span></div>
+  </div>
+  <div class="grid-superior">
+    <div class="painel-card">
+      <div class="painel-titulo">
+        <span>Controle de Fluxo</span>
+        <span style="font-size:9px;color:var(--ouro-claro);font-style:italic" id="label-mes-fluxo"></span>
+      </div>
+      <div class="fluxo-resumo">
+        <div class="fluxo-num fn-ini"><div class="fn-val" id="fl-ini">–</div><div class="fn-label">Iniciados</div></div>
+        <div class="fluxo-num fn-fin"><div class="fn-val" id="fl-fin">–</div><div class="fn-label">Finalizados</div></div>
+        <div class="fluxo-num"><div class="fn-val" id="fl-sal" style="color:var(--ouro-claro)">–</div><div class="fn-label">Saldo</div></div>
+      </div>
+      <div id="tab-fluxo"><div class="empty-msg">Carregando...</div></div>
+    </div>
+    <div class="painel-card">
+      <div class="painel-titulo">
+        <span>Reajustes do Mês</span>
+        <span class="painel-badge" id="badge-reaj">0 contratos</span>
+      </div>
+      <div id="tab-reaj"><div class="empty-msg">Carregando...</div></div>
+      <div class="painel-fonte" id="fonte-igpm"></div>
+    </div>
+  </div>
+  <div class="grid-inferior">
+    <div class="painel-card">
+      <div class="painel-titulo">Imóveis por Cidade</div>
+      <div class="tabela-wrap" id="graf-cidades"><div class="empty-msg">Carregando...</div></div>
+    </div>
+    <div class="painel-card">
+      <div class="painel-titulo">Contratos por Status</div>
+      <div id="graf-status"><div class="empty-msg">Carregando...</div></div>
+    </div>
+    <div class="painel-card">
+      <div class="painel-titulo">Perfil de Inadimplência</div>
+      <div class="inad-wrap" id="graf-inad"><div class="empty-msg">Carregando...</div></div>
+    </div>
+    <div class="painel-card">
+      <div class="painel-titulo">
+        <span>A Vencer — 30 dias</span>
+        <span class="painel-badge" id="badge-vencer">0</span>
+      </div>
+      <div class="tabela-wrap" id="tab-vencer"><div class="empty-msg">Carregando...</div></div>
+    </div>
+  </div>
+  <div class="status-bar">
+    <div><span class="status-dot"></span><span>Sistema operacional</span></div>
+    <span id="ultima-at">Atualizado em –:–</span>
+  </div>
+</main>
+
+<script src="dashboard_dados.js"></script>
+
+<script>
+function atualizarRelogio(){
+  const a=new Date();
+  const ds=['Domingo','Segunda-feira','Terça-feira','Quarta-feira','Quinta-feira','Sexta-feira','Sábado'];
+  const ms=['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
+  document.getElementById('data-atual').textContent=ds[a.getDay()]+', '+a.getDate()+' de '+ms[a.getMonth()]+' de '+a.getFullYear();
+  document.getElementById('hora-atual').textContent=String(a.getHours()).padStart(2,'0')+':'+String(a.getMinutes()).padStart(2,'0')+':'+String(a.getSeconds()).padStart(2,'0');
+}
+atualizarRelogio();
+setInterval(atualizarRelogio,1000);
+
+let DADOS=null, mesSel='';
+
+function aplicarDados(d){
+  DADOS=d;
+  document.getElementById('kpi-ativos').textContent  =d.ativos||'–';
+  document.getElementById('kpi-receita').textContent =d.receita||'–';
+  document.getElementById('kpi-ticket').textContent  =d.ticket||'–';
+  document.getElementById('kpi-igpm').textContent    =d.igpm||'–';
+  document.getElementById('kpi-igpm-fonte').textContent=d.igpmFonte||'FGV/IBRE';
+  document.getElementById('kpi-ipca').textContent    =d.ipcaVal||'–';
+  document.getElementById('kpi-ipca-fonte').textContent=d.ipcaFonte||'IBGE via BCB';
+  document.getElementById('fonte-igpm').textContent  ='Fonte: '+(d.igpmFonte||'FGV/IBRE')+' · IGP-M acumulado 12 meses';
+
+  const anoAtual=d.mesFluxo?d.mesFluxo.split('/')[1]:new Date().getFullYear().toString();
+  let iniAno=0,finAno=0;
+  if(d.fluxo){d.fluxo.forEach(r=>{const aa=r.mes.split('/')[1];if(aa===anoAtual){if(r.tipo==='I')iniAno++;if(r.tipo==='F')finAno++;}});}
+  const saldoAno=iniAno-finAno;
+  const elSaldo=document.getElementById('kpi-saldo-ano');
+  const elCard=document.getElementById('kpi-card-saldo');
+  elSaldo.textContent=(saldoAno>0?'+':'')+saldoAno;
+  elSaldo.className='kpi-valor '+(saldoAno>=0?'saldo-val-pos':'saldo-val-neg');
+  elCard.classList.remove('saldo-pos','saldo-neg');
+  elCard.classList.add(saldoAno>=0?'saldo-pos':'saldo-neg');
+  document.getElementById('kpi-sub-saldo').textContent=iniAno+' iniciados · '+finAno+' finalizados · '+anoAtual;
+
+  if(d.cidades&&d.cidades.length>0)renderBarras(d.cidades);
+  if(d.status&&d.status.length>0)renderPizza(d.status);
+  renderInadimplencia(d);
+  if(d.avencer30)renderAVencer(d.avencer30);
+
+  montarSeletor(d);
+  mesSel=d.mesFluxo||'';
+  filtrarMes(mesSel);
+  document.getElementById('ultima-at').textContent='Atualizado em '+(d.atualizacao||'–:–');
+}
+
+function montarSeletor(d){
+  const sel=document.getElementById('sel-mes');
+  sel.innerHTML='';
+  const meses=new Set();
+  if(d.fluxo)d.fluxo.forEach(r=>meses.add(r.mes));
+  if(d.reajustes)d.reajustes.forEach(r=>meses.add(r.mes));
+  if(d.mesFluxo)meses.add(d.mesFluxo);
+  const nomeMes=['','Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+  const arr=Array.from(meses).sort((a,b)=>{
+    const [ma,ya]=a.split('/').map(Number);
+    const [mb,yb]=b.split('/').map(Number);
+    return(yb*100+mb)-(ya*100+ma);
+  });
+  arr.forEach(m=>{
+    const [mm,aa]=m.split('/');
+    const opt=document.createElement('option');
+    opt.value=m;opt.textContent=nomeMes[parseInt(mm)]+' / '+aa;
+    if(m===d.mesFluxo)opt.selected=true;
+    sel.appendChild(opt);
+  });
+}
+
+function filtrarMes(mes){
+  if(!DADOS)return;
+  mesSel=mes;
+  const nomeMes=['','Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+  const[mm,aa]=mes.split('/');
+  const label=nomeMes[parseInt(mm)]+' / '+aa;
+  document.getElementById('label-mes-fluxo').textContent=label;
+  document.getElementById('label-exibido').textContent='Exibindo: '+label;
+  document.getElementById('kpi-sub-reaj').textContent='em '+label.toLowerCase();
+  const reajFilt=DADOS.reajustes?DADOS.reajustes.filter(r=>r.mes===mes):[];
+  document.getElementById('kpi-reajuste').textContent=reajFilt.length;
+  const fluxFilt=DADOS.fluxo?DADOS.fluxo.filter(r=>r.mes===mes):[];
+  const ini=fluxFilt.filter(r=>r.tipo==='I').length;
+  const fin=fluxFilt.filter(r=>r.tipo==='F').length;
+  const sal=ini-fin;
+  document.getElementById('fl-ini').textContent=ini;
+  document.getElementById('fl-fin').textContent=fin;
+  const elS=document.getElementById('fl-sal');
+  elS.textContent=(sal>0?'+':'')+sal;
+  elS.style.color=sal>0?'var(--verde)':sal<0?'var(--vermelho-claro)':'var(--texto-suave)';
+  renderFluxo(fluxFilt);
+  renderReajuste(reajFilt);
+  document.getElementById('btn-hoje').className='btn-mes'+(mes===DADOS.mesFluxo?' ativo':'');
+
+// Atualiza IGP-M e IPCA do mês selecionado
+  if(DADOS.indices && DADOS.indices[mes]){
+    document.getElementById('kpi-igpm').textContent=DADOS.indices[mes].igpm;
+    document.getElementById('kpi-ipca').textContent=DADOS.indices[mes].ipca;
+    if(DADOS.indices[mes].igpmPeriodo){
+      document.getElementById('kpi-igpm-fonte').textContent=
+        'FGV/IBRE · ('+DADOS.indices[mes].igpmPeriodo+')';
+    }
+    if(DADOS.indices[mes].ipcaPeriodo){
+      document.getElementById('kpi-ipca-fonte').textContent=
+        'IBGE via BCB · ('+DADOS.indices[mes].ipcaPeriodo+')';
+    }
+  }
+}
+
+function voltarHoje(){if(DADOS){document.getElementById('sel-mes').value=DADOS.mesFluxo;filtrarMes(DADOS.mesFluxo);}}
+
+function renderFluxo(f){
+  const el=document.getElementById('tab-fluxo');
+  if(!f||f.length===0){el.innerHTML='<div class="empty-msg">Nenhum contrato neste mês</div>';return;}
+  let h='<table><thead><tr><th>Tipo</th><th>PL</th><th>Contrato</th><th>Proprietário</th><th>Data</th></tr></thead><tbody>';
+  f.forEach(r=>{const b=r.tipo==='I'?'<span class="badge-I">INICIADO</span>':'<span class="badge-F">FINALIZADO</span>';h+=`<tr><td>${b}</td><td class="pl-col">${r.pl}</td><td>${r.cont}</td><td>${r.nome}</td><td>${r.data}</td></tr>`;});
+  el.innerHTML=h+'</tbody></table>';
+}
+
+function renderReajuste(r){
+  const el=document.getElementById('tab-reaj');
+  const badge=document.getElementById('badge-reaj');
+  if(!r||r.length===0){el.innerHTML='<div class="empty-msg">Nenhum reajuste neste mês</div>';if(badge)badge.textContent='0 contratos';return;}
+  if(badge)badge.textContent=r.length+' contrato'+(r.length>1?'s':'');
+  let h='<table><thead><tr><th>PL</th><th>Cont</th><th>Locatário</th><th>Aluguel</th><th>Início</th><th>Venc</th></tr></thead><tbody>';
+  r.forEach(x=>{h+=`<tr><td class="pl-col">${x.pl}</td><td>${x.cont}</td><td>${x.loc}</td><td class="val-verde">${x.alug}</td><td>${x.inicio}</td><td class="val-ouro">${x.venc}</td></tr>`;});
+  el.innerHTML=h+'</tbody></table>';
+}
+
+function renderBarras(cidades){
+  const max=Math.max(...cidades.map(c=>c.qtd));
+  const h=cidades.map(c=>`<div class="barra-item"><div class="barra-label">${c.cidade}</div><div class="barra-trilha"><div class="barra-fill" data-pct="${(c.qtd/max*100).toFixed(1)}" style="background:linear-gradient(90deg,var(--vermelho),var(--vermelho-claro))"></div></div><div class="barra-qtd">${c.qtd}</div></div>`).join('');
+  document.getElementById('graf-cidades').innerHTML=h;
+  setTimeout(()=>{document.querySelectorAll('#graf-cidades .barra-fill').forEach(el=>{el.style.width=el.dataset.pct+'%'});},100);
+}
+
+function renderPizza(statusArr){
+  // Cores fixas únicas por status
+  const coresMap={
+    '5.Finalizado':'#8B1A1A','3.ativo':'#C9A84C',
+    '4.Suspenso':'#4CAF82','1.Anunciado':'#5B8DB8',
+    '2.Negocial':'#9B59B6'
+  };
+  const coresFallback=['#E67E22','#1ABC9C','#E74C3C','#F39C12','#16A085','#8E44AD'];
+  let fbIdx=0;
+  const corPorStatus={};
+  statusArr.forEach(item=>{
+    corPorStatus[item.status]=coresMap[item.status]||coresFallback[fbIdx++];
+  });
+
+  const total=statusArr.reduce((s,i)=>s+i.qtd,0);
+  if(total===0)return;
+
+  // SVG com viewBox proporcional — será esticado pelo CSS
+  const SZ=200;
+  const cx=SZ/2,cy=SZ/2,r=(SZ/2)-4;
+  let angulo=-Math.PI/2,paths='';
+  statusArr.forEach(item=>{
+    const cor=corPorStatus[item.status];
+    const fatia=(item.qtd/total)*2*Math.PI;
+    const x1=cx+r*Math.cos(angulo),y1=cy+r*Math.sin(angulo);
+    angulo+=fatia;
+    const x2=cx+r*Math.cos(angulo),y2=cy+r*Math.sin(angulo);
+    const grande=fatia>Math.PI?1:0;
+    paths+=`<path d="M${cx},${cy} L${x1.toFixed(1)},${y1.toFixed(1)} A${r},${r} 0 ${grande},1 ${x2.toFixed(1)},${y2.toFixed(1)} Z" fill="${cor}" stroke="#0F0A0A" stroke-width="2"/>`;
+  });
+  // SVG responsivo via viewBox
+  const svg=`<svg viewBox="0 0 ${SZ} ${SZ}" style="width:100%;max-height:160px;display:block">${paths}</svg>`;
+
+  const legenda=statusArr.map(item=>{
+    const cor=corPorStatus[item.status];
+    const pct=((item.qtd/total)*100).toFixed(1);
+    return `<div class="leg-item"><div class="leg-cor" style="background:${cor}"></div><span>${item.status}</span><span class="leg-pct">${item.qtd} · ${pct}%</span></div>`;
+  }).join('');
+
+  document.getElementById('graf-status').innerHTML=svg+`<div class="pizza-legenda">${legenda}</div>`;
+}
+
+function renderInadimplencia(d){
+  const f0=d.faixa0||0,f1=d.faixa1||0,f2=d.faixa2||0,f3=d.faixa3||0;
+  const total=f0+f1+f2+f3;
+  if(total===0){document.getElementById('graf-inad').innerHTML='<div class="empty-msg">Sem dados</div>';return;}
+  function barra(label,val,cor){
+    const pct=total>0?((val/total)*100).toFixed(1):0;
+    return `<div class="inad-barra"><div class="inad-label-row"><span class="inad-label">${label}</span><span class="inad-val" style="color:${cor}">${val} <span style="font-size:8px;opacity:0.7">(${pct}%)</span></span></div><div class="barra-trilha" style="height:10px"><div class="barra-fill" data-pct="${pct}" style="background:${cor};width:0%;height:100%;border-radius:3px;transition:width 1s ease"></div></div></div>`;
+  }
+  const html=
+    barra('Alto risco (6+ atrasos)',f3,'#6B1010')+
+    barra('Risco (3-5 atrasos)',f2,'var(--vermelho-claro)')+
+    barra('Atenção (1-2 atrasos)',f1,'var(--amarelo)')+
+    barra('Adimplente (0 atrasos)',f0,'var(--verde)');
+  document.getElementById('graf-inad').innerHTML=html;
+  setTimeout(()=>{document.querySelectorAll('#graf-inad .barra-fill').forEach(el=>{el.style.width=el.dataset.pct+'%'});},100);
+}
+
+function renderAVencer(lista){
+  const el=document.getElementById('tab-vencer');
+  const badge=document.getElementById('badge-vencer');
+  if(!lista||lista.length===0){el.innerHTML='<div class="empty-msg">Nenhum contrato a vencer em 30 dias</div>';if(badge)badge.textContent='0';return;}
+  if(badge)badge.textContent=lista.length;
+  lista.sort((a,b)=>a.dias-b.dias);
+  let h='<table><thead><tr><th>PL</th><th>Cont</th><th>Locatário</th><th>Vencimento</th><th>Dias</th></tr></thead><tbody>';
+  lista.forEach(r=>{
+    const cls=r.dias<=10?'dias-urgente':r.dias<=20?'dias-alerta':'dias-ok';
+    h+=`<tr><td class="pl-col">${r.pl}</td><td>${r.cont}</td><td>${r.loc}</td><td>${r.venc}</td><td class="${cls}">${r.dias}d</td></tr>`;
+  });
+  el.innerHTML=h+'</tbody></table>';
+}
+
+if(window.DADOS_VBA){aplicarDados(window.DADOS_VBA);}
+</script>
+</body>
+</html>
